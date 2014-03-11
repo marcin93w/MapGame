@@ -77,7 +77,7 @@ function Game(map) {
             
             currentWay = chosenArm.street;
             backward = chosenArm.backward;
-            currentPointId = backward ? currentWay.points.length - 1 : 0; //chosenArm.directionNodeId;
+            currentPointId = backward ? currentWay.points.length - 1 : 0;
             continueDrive();
             
         }

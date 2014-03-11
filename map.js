@@ -12,8 +12,8 @@ var MyMap = (function () {
     var mapDiv = 'map';
     var zoom = 17;
     
-    var moveStep = 0.000008;
-    var moveTimeout = 5;
+    var moveStep = 0.00001;
+    var moveTimeout = 6;
     
     var map;
     
