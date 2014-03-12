@@ -13,11 +13,13 @@ function CrossroadSolver (crossroad, previous) {
     this.canTurnAround = true;
 }
 
+//TODO: zmienic konstruktor na bardziej ogoln (nie kozystajacy z street.points) i dodac prototyp w engine.js
 function CrossroadArm (street, backward, isTurnAround) {
+    //way whitch is represented by this arm
     this.street = street;
-    this.directionNodeId = backward ? street.points.length - 2 : 1;
     this.backward = backward;
     
+    this.directionNodeId = backward ? street.points.length - 2 : 1;
     this.turnAroundArm = isTurnAround;
 }
 
