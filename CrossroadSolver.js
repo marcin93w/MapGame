@@ -13,13 +13,13 @@ function CrossroadSolver (crossroad, previous) {
     this.canTurnAround = true;
 }
 
-//TODO: zmienic konstruktor na bardziej ogoln (nie kozystajacy z street.points) i dodac prototyp w engine.js
-function CrossroadArm (street, backward, isTurnAround) {
+///Construct arm from the Way
+function CrossroadArm (way, backward, isTurnAround) {
     //way whitch is represented by this arm
-    this.street = street;
+    this.way = way;
     this.backward = backward;
     
-    this.directionNodeId = backward ? street.points.length - 2 : 1;
+    this.directionNode = backward ? way.points[way.points.length - 2] : way.points[1];
     this.turnAroundArm = isTurnAround;
 }
 
@@ -44,7 +44,7 @@ Vector.prototype.angle = function(other) {
     return Math.acos(
             (this.a*other.a + this.b*other.b) / 
             (Math.sqrt(this.a*this.a+this.b*this.b)*Math.sqrt(other.a*other.a+other.b*other.b))
-            );
+        );
 };
 
 CrossroadSolver.prototype.getClosestArm = function() {
@@ -54,7 +54,7 @@ CrossroadSolver.prototype.getClosestArm = function() {
     for(var i=0; i<this.arms.length; i++) {
         if(!this.canTurnAround && this.arms[i].turnAroundArm)
             continue;
-        var vector = new Vector(this.center, this.arms[i].street.points[this.arms[i].directionNodeId]);
+        var vector = new Vector(this.center, this.arms[i].directionNode);
         var calculatedAngle = vector.angle(this.directionVector);
         if(calculatedAngle < angle) {
             angle = calculatedAngle;

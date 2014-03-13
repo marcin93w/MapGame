@@ -2,7 +2,7 @@
  * Game engine
  */
 
-function Game(map) {
+function Engine(map, stage, car) {
     
     var currentWay;
     var backward;
@@ -13,7 +13,7 @@ function Game(map) {
     var left = false;
     var right = false;
     
-    //returns turn angle based on pressed keys
+    ///returns turn angle based on pressed keys
     function getTurnAngle() {
         if(up) {
             if(right) {
@@ -45,41 +45,42 @@ function Game(map) {
         return 0;
     }
     
+    CrossroadSolver.prototype.addAllWaysAsArms = function(way, backward) {
+    	var backwardWays = backward ? way.neighbors.prevBackward : way.neighbors.nextBackward;
+        var forwardWays = backward ? way.neighbors.prevForward : way.neighbors.nextForward;
+        
+        for(var i=0; i<backwardWays.length; i++) {
+            if(!backwardWays[i].oneway)
+                this.addArm(new CrossroadArm(backwardWays[i], true, false));
+        }
+        for(var i=0; i<forwardWays.length; i++) {
+            this.addArm(new CrossroadArm(forwardWays[i], false, false));
+        }
+        if(!way.oneway)
+            this.addArm(new CrossroadArm(way, !backward, true));
+    };
+    
     function continueDrive() {
         var step = backward ? -1 : 1;
         if(!((backward && currentPointId === 0) || (!backward && currentPointId === currentWay.points.length-1))) {
+        	//node is not a crossroad
             map.moveSmoothly(currentWay.points[currentPointId += step], continueDrive);
         } else {
             //node is a crossroad
             var crossroad = new CrossroadSolver(currentWay.points[currentPointId], currentWay.points[currentPointId - step]);
             
-            //sterowanie
             var turnAngle = getTurnAngle();
             crossroad.turn(turnAngle);
             if(turnAngle <= 90 || turnAngle >= 270)
                 crossroad.canTurnAround = false;
             
-            //dodanie mozliwych drog
-            var backwardWays = backward ? currentWay.neighbors.prevBackward : currentWay.neighbors.nextBackward;
-            var forwardWays = backward ? currentWay.neighbors.prevForward : currentWay.neighbors.nextForward;
-            
-            for(var i=0; i<backwardWays.length; i++) {
-                if(!backwardWays[i].oneway)
-                    crossroad.addArm(new CrossroadArm(backwardWays[i], true, false));
-            }
-            for(var i=0; i<forwardWays.length; i++) {
-                crossroad.addArm(new CrossroadArm(forwardWays[i], false, false));
-            }
-            if(!currentWay.oneway)
-                crossroad.addArm(new CrossroadArm(currentWay, !backward, true));
-            
+            crossroad.addAllWaysAsArms(currentWay, backward);        
             var chosenArm = crossroad.getClosestArm();
             
-            currentWay = chosenArm.street;
+            currentWay = chosenArm.way;
             backward = chosenArm.backward;
             currentPointId = backward ? currentWay.points.length - 1 : 0;
-            continueDrive();
-            
+            continueDrive();         
         }
     }
     
